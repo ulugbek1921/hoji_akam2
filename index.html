@@ -3,152 +3,181 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Товар Кирими</title>
+    <title>Янги Товар Қўшиш</title>
+    <!-- Telegram Web App Script -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <!-- Google Fonts & Tailwind CSS (Замонавий дизайн учун) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style>
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--tg-theme-bg-color, #ffffff);
-            color: var(--tg-theme-text-color, #000000);
-            margin: 0;
-            padding: 20px;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-            font-size: 14px;
-        }
-        input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            box-sizing: border-box;
-            background-color: var(--tg-theme-secondary-bg-color, #f0f0f0);
-            color: var(--tg-theme-text-color, #000000);
-        }
-        .btn {
-            width: 100%;
-            padding: 12px;
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-        .btn-primary {
-            background-color: var(--tg-theme-button-color, #2481cc);
-            color: var(--tg-theme-button-text-color, #ffffff);
-        }
-        .btn-secondary {
-            background-color: #e67e22;
-            color: white;
-        }
-        .readonly-bg {
-            background-color: #e0e0e0;
-            cursor: not-allowed;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--tg-theme-bg-color, #f4f6f9);
+            color: var(--tg-theme-text-color, #232323);
         }
     </style>
 </head>
-<body>
+<body class="p-4 antialiased">
 
-    <h2>📦 Янги Товар Кирими</h2>
-    <hr>
+    <div class="max-w-md mx-auto bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-5">
+        
+        <!-- Сарлавҳа -->
+        <div class="text-center">
+            <h2 class="text-xl font-bold text-gray-800">📦 Янги Товар Кирими</h2>
+            <p class="text-xs text-gray-500 mt-1">Складга янги маҳсулот қўшиш формаси</p>
+        </div>
 
-    <div class="form-group">
-        <label for="prod_name">Товар номи:</label>
-        <input type="text" id="prod_name" placeholder="Масалан: Чехол iPhone 15">
+        <form id="productForm" class="space-y-4">
+            
+            <!-- Товар Номи -->
+            <div>
+                <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1">Товар номи</label>
+                <input type="text" id="name" required placeholder="Масалан: Гилам Бўйра" 
+                       class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm transition-all">
+            </div>
+
+            <!-- Миқдори -->
+            <div>
+                <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1">Миқдори (Метр / Дона)</label>
+                <input type="number" id="quantity" required placeholder="0" 
+                       class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm transition-all">
+            </div>
+
+            <!-- Икки устунли блок: Келиш Нархи ва Устама -->
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1">Келиш Нархи (сўм)</label>
+                    <input type="text" id="incoming_price_input" required placeholder="0" 
+                           class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm transition-all text-right font-medium">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1">Устама (%)</label>
+                    <input type="number" id="markup_percent" required placeholder="0" 
+                           class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm transition-all text-center">
+                </div>
+            </div>
+
+            <!-- Сотилиш Нархи (Автоматик ва Чиройли) -->
+            <div class="bg-gray-50 p-4 rounded-xl border border-gray-100 flex justify-between items-center">
+                <div>
+                    <span class="block text-xs font-semibold text-gray-500 uppercase tracking-wider">Сотилиш Нархи:</span>
+                    <span id="selling_price_display" class="text-lg font-bold text-green-600">0 сўм</span>
+                </div>
+                <div class="text-right">
+                    <span class="text-[10px] text-gray-400 block">Соф фойда / м</span>
+                    <span id="profit_display" class="text-xs font-semibold text-blue-600">0 сўм</span>
+                </div>
+            </div>
+
+            <!-- QR-Код Сканер Блоки -->
+            <div>
+                <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1">Штрих / QR Код</label>
+                <div class="flex gap-2">
+                    <input type="text" id="qr_code" readonly placeholder="Сканер қилинмаган" 
+                           class="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-gray-50 text-xs font-mono text-gray-600 focus:outline-none">
+                    <button type="button" id="scanBtn" 
+                            class="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-medium flex items-center gap-1 transition-colors whitespace-nowrap shadow-sm">
+                        📷 Сканер
+                    </button>
+                </div>
+            </div>
+
+            <!-- Сақлаш Тугмаси -->
+            <button type="submit" 
+                    class="w-full py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-xl text-sm transition-colors shadow-md mt-2">
+                💾 Базага Сақлаш
+            </button>
+
+        </form>
     </div>
-
-    <div class="form-group">
-        <label for="prod_qty">Миқдори (Складдаги сони):</label>
-        <input type="number" id="prod_qty" placeholder="0" min="1">
-    </div>
-
-    <div class="form-group">
-        <label for="incoming_price">Келиш нархи (сўм):</label>
-        <input type="number" id="incoming_price" placeholder="50000" oninput="calculateSellingPrice()">
-    </div>
-
-    <div class="form-group">
-        <label for="markup_percent">Устама фоизи (%):</label>
-        <input type="number" id="markup_percent" placeholder="20" value="20" oninput="calculateSellingPrice()">
-    </div>
-
-    <div class="form-group">
-        <label for="selling_price">Сотиш нархи (Автоматик):</label>
-        <input type="number" id="selling_price" class="readonly-bg" readonly placeholder="60000">
-    </div>
-
-    <div class="form-group">
-        <label for="qr_code">QR / Штрих Код:</label>
-        <input type="text" id="qr_code" placeholder="Сканер қилинг ёки ёзинг">
-        <button class="btn btn-secondary" onclick="scanQRCode()">📷 QR Код Сканерлаш</button>
-    </div>
-
-    <button class="btn btn-primary" onclick="sendDataToBot()">💾 Сақлаш ва Расм юбориш</button>
 
     <script>
-        // Telegram WebApp-ни ишга тушириш
         const tg = window.Telegram.WebApp;
-        tg.expand(); // Иловани тўлиқ экранда очиш
+        tg.ready();
+        tg.expand(); // Ойнани тўлиқ экранга очади
 
-        // 1. Сотиш нархини автоматик ҳисоблаш логикаси
-        function calculateSellingPrice() {
-            const incoming = parseFloat(document.getElementById('incoming_price').value) || 0;
-            const markup = parseFloat(document.getElementById('markup_percent').value) || 0;
-            
-            // Формула: Келиш нархи + (Келиш нархи * Фоиз / 100)
-            const selling = incoming + (incoming * markup / 100);
-            document.getElementById('selling_price').value = Math.round(selling);
+        // Элементларни оламиз
+        const incPriceInput = document.getElementById('incoming_price_input');
+        const markupInput = document.getElementById('markup_percent');
+        const sellingPriceDisplay = document.getElementById('selling_price_display');
+        const profitDisplay = document.getElementById('profit_display');
+        const qrInput = document.getElementById('qr_code');
+        const scanBtn = document.getElementById('scanBtn');
+        const form = document.getElementById('productForm');
+
+        // Рақамни мингликка ажратиш функцияси (Масалан: 1000000 -> "1 000 000")
+        function formatNumber(value) {
+            let num = value.replace(/\D/g, ""); // Фақат рақамларни қолдириш
+            return num.replace(/\B(?=(\d{3})+(?!\d))/g, " "); // Мингликка ажратиш
         }
 
-        // 2. Telegram Камераси орқали QR Код сканерлаш (Сиз айтган функция)
-        function scanQRCode() {
+        // Ажратилган матндан тоза рақамни қайтариш (Масалан: "1 000 000" -> 1000000)
+        function getCleanNumber(value) {
+            return parseFloat(value.replace(/\s/g, '')) || 0;
+        }
+
+        // Мингликка ажратиш воқелиги
+        incPriceInput.addEventListener('input', (e) => {
+            let cursorPosition = e.target.selectionStart;
+            let originalLength = e.target.value.length;
+            
+            e.target.value = formatNumber(e.target.value);
+            
+            // Курсор позициясини тўғирлаш
+            let newLength = e.target.value.length;
+            cursorPosition = cursorPosition + (newLength - originalLength);
+            e.target.setSelectionRange(cursorPosition, cursorPosition);
+            
+            calculatePrices();
+        });
+
+        markupInput.addEventListener('input', calculatePrices);
+
+        // Нархларни ҳисоблаш
+        function calculatePrices() {
+            const incomingPrice = getCleanNumber(incPriceInput.value);
+            const markupPercent = parseFloat(markupInput.value) || 0;
+
+            const sellingPrice = incomingPrice + (incomingPrice * (markupPercent / 100));
+            const profit = sellingPrice - incomingPrice;
+
+            // Минглик форматида экранга чиқариш
+            sellingPriceDisplay.textContent = new Intl.NumberFormat('ru-RU').format(Math.round(sellingPrice)) + " сўм";
+            profitDisplay.textContent = new Intl.NumberFormat('ru-RU').format(Math.round(profit)) + " сўм";
+        }
+
+        // Telegram Камераси орқали QR код сканерлаш
+        scanBtn.addEventListener('click', () => {
             if (tg.showScanQrPopup) {
-                tg.showScanQrPopup({ text: "Товар устидаги QR ёки Штрих-кодни сканерланг" }, function(text) {
-                    document.getElementById('qr_code').value = text;
-                    tg.closeScanQrPopup(); // Скан тугагач камерани ёпиш
-                    return true;
+                tg.showScanQrPopup({ text: "Товарнинг штрих ёки QR кодини сканерланг" }, function(text) {
+                    qrInput.value = text;
+                    tg.closeScanQrPopup();
                 });
             } else {
-                alert("Ушбу функция Telegram-нинг бу версиясида ишламайди.");
+                alert("QR Сканер фақат мобил қурилмадаги Telegram иловасида ишлайди.");
             }
-        }
+        });
 
-        // 3. Маълумотларни Ботга юбориш
-        function sendDataToBot() {
-            const name = document.getElementById('prod_name').value;
-            const qty = document.getElementById('prod_qty').value;
-            const incoming = document.getElementById('incoming_price').value;
-            const markup = document.getElementById('markup_percent').value;
-            const selling = document.getElementById('selling_price').value;
-            const qr = document.getElementById('qr_code').value;
+        // Форма юборилганда ботга маълумотни жўнатиш
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
 
-            // Валидация (мажбурий майдонларни текшириш)
-            if (!name || !qty || !incoming || !qr) {
-                tg.showAlert("Илтимос, барча майдонларни тўлдиринг ва QR кодни сканерланг!");
-                return;
-            }
+            const incomingPrice = getCleanNumber(incPriceInput.value);
+            const markupPercent = parseFloat(markupInput.value) || 0;
+            const sellingPrice = incomingPrice + (incomingPrice * (markupPercent / 100));
 
-            // Маълумотларни JSON форматга келтириш
             const data = {
                 action: "add_product",
-                name: name,
-                quantity: parseInt(qty),
-                incoming_price: parseFloat(incoming),
-                markup_percent: parseFloat(markup),
-                selling_price: parseFloat(selling),
-                qr_code: qr
+                name: document.getElementById('name').value,
+                quantity: parseInt(document.getElementById('quantity').value) || 0,
+                incoming_price: incomingPrice,
+                markup_percent: markupPercent,
+                selling_price: Math.round(sellingPrice),
+                qr_code: qrInput.value || "NO_QR"
             };
 
-            // Ботга маълумотни юбориш (sendData фақат ТМА клавиатура тугмасидан очилганда ишлайди)
             tg.sendData(JSON.stringify(data));
-        }
+        });
     </script>
 </body>
 </html>
